@@ -1,23 +1,19 @@
-import random
+import random, requests
 
-songs = [
-    {"title": "Billie Jean", "album": "Thriller", "year": 1982, "genre": "pop"},
-    {"title": "Beat It", "album": "Thriller", "year": 1982, "genre": "rock"},
-    {"title": "Thriller", "album": "Thriller", "year": 1982, "genre": "pop"},
-    {"title": "Smooth Criminal", "album": "Bad", "year": 1987, "genre": "pop"},
-    {"title": "Man in the Mirror", "album": "Bad", "year": 1987, "genre": "ballad"},
-    {"title": "Don't Stop 'Til You Get Enough", "album": "Off the Wall", "year": 1979, "genre": "funk"},
-]
+def generate_playlist(genre=None, era=None, number=3):
+    response = requests.get("https://douglasdboliveira.pythonanywhere.com/songs")
 
-def generate_playlist(year=None, number=3):
-    if year:
-        filtered = [s for s in songs if s["year"] == year]
-    else:
-        filtered = songs
-    
+    filtered = response.json()
+
+    if genre:
+        filtered = [s for s in filtered if genre.lower() in s["genre"].lower()]
+    if era:
+        filtered = [s for s in filtered if era.lower() in s["era"].lower()]
+
     return random.sample(filtered, min(number, len(filtered)))
 
-playlist = generate_playlist(year=1982, number=2)
+playlist = generate_playlist(genre="pop", era="2000s", number=2)
+
 print("Your Michael Jackson playlist:")
 for s in playlist:
-    print(f"- {s['title']} ({s['album']}, {s['year']})")
+    print(f"- {s['title']} ({s['album']}, {s['era']})")
